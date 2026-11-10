@@ -59,7 +59,10 @@ class RingsRoutine(Routine):
         if choice[3] == "I":
             newSkill = RingsSkill(choice[0], choice[1], choice[2], choice[3], choice[4], choice[5], None)
         elif choice[3] == "II" or choice[3] == "III":
-            newSkill = RingsSkill(choice[0], choice[1], choice[2], choice[3], choice[4], None, choice[5])
+            if task == "new":
+                newSkill = RingsSkill(choice[0], choice[1], choice[2], choice[3], choice[4], None, choice[5])
+            elif task == "view":
+                newSkill = RingsSkill(choice[0], choice[1], choice[2], choice[3], choice[4], None, choice[6])
         elif choice[3] == "IV":
             newSkill = RingsSkill(choice[0], choice[1], choice[2], choice[3], choice[4], None, None)
         return newSkill
@@ -84,17 +87,25 @@ class RingsRoutine(Routine):
                     egIIstrengths.append(self.countingElements[i].strengthShape)
                 elif self.countingElements[i].eg == "III":
                     egIIIstrengths.append(self.countingElements[i].strengthShape)
+            # print(egIIIstrengths)
+            # print(egIIIstrengths)
+            # print(f"EG: {skill.eg}")
             if skill.eg == "II":
+                # print("Checking strength shapes for II")
                 for i in range(len(egIIstrengths)):
                     if skill.strengthShape == egIIstrengths[i]:
+                        # print("Returning False")
                         return False
             elif skill.eg == "III":
+                # print("Checking strength shapes for III")
                 for i in range(len(egIIIstrengths)):
                     if skill.strengthShape == egIIIstrengths[i]:
-                        return False
-            else:
-                return True
+                        # print("Returning False")
+                        return False 
+            # print("Returning True")
+            return True
         else:
+            # print("Returning True")
             return True
 
     # Overrides the default make_table method
