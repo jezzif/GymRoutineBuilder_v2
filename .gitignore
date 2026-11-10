@@ -10,4 +10,4 @@ wheels/
 .venv
 
 # DB file
-Databases/
+*.db
