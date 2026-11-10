@@ -33,6 +33,7 @@ class Routine:
     # Procedure that checks if the routine meets all of the FIG requirements.
     def validate_routine(self):
         self.isValid = True
+
         # Determine the counting elements of the routine
         sortedSkills = sorted(self.skills, key=lambda skill: skill.value, reverse=True)
         iTaken = 0
@@ -58,17 +59,23 @@ class Routine:
                 ivTaken += 1
             else:
                 i += 1
+
         # print("Counting elements initial:")
         # for i in range(len(self.countingElements)):
         #     print(self.countingElements[i].name)
         # print()
+
+        # Find a swing to handstand element if it exists
         if self.apparatus == "Still Rings":
             swingToHSExists = False
+            # Search through intial counting elements for a swing to handstand
             for i in range(len(self.countingElements)):
                 if self.countingElements[i].eg == "I" and self.countingElements[i].swingToHS == "1":
                     swingToHSExists = True
             i = 0
-            print(len(sortedSkills))
+            # print(len(sortedSkills))
+            # If a swing to handstand not yet found search through the rest of the routine
+            # and add it to counting elements before any other skill
             while i < len(sortedSkills) and not swingToHSExists:
                 print(f"Iteration: {i}")
                 print(sortedSkills[i].name)
@@ -93,22 +100,24 @@ class Routine:
 
         # Adds the remaining highest value skills until 8 skills are reached.
         # Checks if the skill conforms to the special repitition rules.
+        
         for i in range(topRange - len(self.countingElements)):
-            print(f"I: {iTaken}, II: {iiTaken}, III: {iiiTaken}, IV: {ivTaken}")
+            # print(f"Checking {sortedSkills[i].name}")
+            # print(f"I: {iTaken}, II: {iiTaken}, III: {iiiTaken}, IV: {ivTaken}")
             append = False
-            if sortedSkills[i].eg == "I" and iTaken < 4:
+            if sortedSkills[i].eg == "I" and iTaken <= 4:
                 append = self.special_repititions(sortedSkills[i])
                 if append:
                     iTaken += 1
-            elif sortedSkills[i].eg == "II" and iiTaken < 4:
+            elif sortedSkills[i].eg == "II" and iiTaken <= 4:
                 append = self.special_repititions(sortedSkills[i])
                 if append:
                     iiTaken += 1
-            elif sortedSkills[i].eg == "III" and iiiTaken < 4:
+            elif sortedSkills[i].eg == "III" and iiiTaken <= 4:
                 append = self.special_repititions(sortedSkills[i])
                 if append:
                     iiiTaken += 1     
-            elif sortedSkills[i].eg == "IV" and ivTaken < ivMax:
+            elif sortedSkills[i].eg == "IV" and ivTaken <= ivMax:
                 append = self.special_repititions(sortedSkills[i])
                 if append:
                     ivTaken += 1
@@ -120,9 +129,10 @@ class Routine:
             if append:
                 self.countingElements.append(sortedSkills[i])
                 # print(f"Appending {sortedSkills[i].name}")
-        print("COUNTING ELEMENTS")
-        for i in range(len(self.countingElements)):
-            print(self.countingElements[i].name)
+
+        # print("COUNTING ELEMENTS")
+        # for i in range(len(self.countingElements)):
+        #     print(self.countingElements[i].name)
 
         # Checks how many skills the routine has
         if self.numberOfSkills < 6:
