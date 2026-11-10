@@ -54,14 +54,20 @@ class PbarsRoutine(Routine):
             return newSkill
         else:
             return "cancel"
-        
+
+    #
     def make_newSkill(self, choice, task):
         if choice[3] == "I":
             newSkill = PbarsSkill(choice[0], choice[1], choice[2], choice[3], choice[4], choice[5], None, None)
         elif choice[3] == "II" or choice[3] == "IV":
             newSkill = PbarsSkill(choice[0], choice[1], choice[2], choice[3], choice[4], None, None, None)
         elif choice[3] == "III":
-            newSkill = PbarsSkill(choice[0], choice[1], choice[2], choice[3], choice[4], None, choice[5], choice[6])
+            if task == "new":
+                newSkill = PbarsSkill(choice[0], choice[1], choice[2], choice[3], choice[4], None, choice[5], choice[6])
+            elif task == "view":
+                newSkill = PbarsSkill(choice[0], choice[1], choice[2], choice[3], choice[4], None, choice[6], choice[7])
+            
+        
         return newSkill
 
     def special_repititions(self, skill):

@@ -121,7 +121,7 @@ class RoutineBuilder:
 
                 i = 0
                 for row in rows:
-                    print(row)
+                    # print(row)
                     
                     newSkill = currentRoutine.make_newSkill(row, "view")
                     currentRoutine.skills.append(newSkill)
