@@ -47,15 +47,20 @@ class VaultRoutine(Routine):
             choice = cursor.fetchone()        
             # Print the chosen skill and create a new skill object
             print(choice[0])
-            newSkill = self.make_newSkill(choice)
+            newSkill = self.make_newSkill(choice, "new")
             print(choice)
             # Returns the chosen skill as an object
             return newSkill
         else:
             return "cancel"
-        
-    def make_newSkill(self, choice):
-        newSkill = Skill.Skill(choice[0], choice[1], choice[2], choice[3], choice[4])
+
+    # Function to turn skill returned from database query into
+    # a Skill object
+    # Parameters:
+    # choice - the row from the database
+    # task - to determine whether the routine is being created or viewed
+    def make_newSkill(self, choice, task):
+        newSkill = Skill(choice[0], choice[1], choice[2], choice[3], choice[4])
         return newSkill
         
     # Overrides the default make_table method

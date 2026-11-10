@@ -59,6 +59,12 @@ class FloorRoutine(Routine):
         else:
             return "cancel"
 
+    
+    # Function to turn skill returned from database query into
+    # a FloorSkill object
+    # Parameters:
+    # choice - the row from the database
+    # task - to determine whether the routine is being created or viewed
     def make_newSkill(self, choice, task):
         if choice[3] == "I":
             newSkill = FloorSkill(choice[0], choice[1], choice[2], choice[3], choice[4], False, choice[5], choice[6], choice[7], None)
@@ -70,15 +76,21 @@ class FloorRoutine(Routine):
         elif choice[3] == "IV":
             newSkill = FloorSkill(choice[0], choice[1], choice[2], choice[3], choice[4], False, None, None, None, None)
         return newSkill
-    
+
+    # Procedure to check whether the routine meets FIG requirements
     def validate_routine(self):
+        # Runs default method from routine.py
         super().validate_routine()
         # print(self.skills[-1].name)
         # print(self.skills[-1].doubleSalto)
+
+        # Checks floor specific requirements
+        # Check dismount is multi salto element
         if self.skills[-1].doubleSalto != "1":
             self.isValid = False
             print("This routine has no valid dismount.")
             print("A dismount in a floor exercise routine needs to be an multiple salto element.")
+        # Check if single leg balance element exists
         oneLegBalance = False
         for i in range(len(self.skills)):
             if self.skills[i].oneLegBalance == "1":
@@ -89,8 +101,8 @@ class FloorRoutine(Routine):
             self.isValid = False
     
     # Overrides the default special_repititions method
-    # Function to check if the skill being possibly added to the counting elements exceeds the specific apparatuses
-    # special repitition rules
+    # Function to check if the routine obeys the special repititions requirements
+    # in article 10.2.2 of the MAG Code of Points 2025-2028
     # Parameters:
     # skill - The skill being checked to be added to the counting elements
     def special_repititions(self, skill):

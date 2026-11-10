@@ -54,7 +54,12 @@ class RingsRoutine(Routine):
             return newSkill
         else:
             return "cancel"
-        
+
+    # Function to turn skill returned from database query into
+    # a RingsSkill object
+    # Parameters:
+    # choice - the row from the database
+    # task - to determine whether the routine is being created or viewed
     def make_newSkill(self, choice, task):
         if choice[3] == "I":
             newSkill = RingsSkill(choice[0], choice[1], choice[2], choice[3], choice[4], choice[5], None)
@@ -66,9 +71,13 @@ class RingsRoutine(Routine):
         elif choice[3] == "IV":
             newSkill = RingsSkill(choice[0], choice[1], choice[2], choice[3], choice[4], None, None)
         return newSkill
-    
+
+    # Procedure to check whether the routine meets FIG requirements
     def validate_routine(self):
+        # Runs default method from routine.py
         super().validate_routine()
+        # Checks rings specific requirements
+        # Checks if swing to handstand element exists
         swingToHSExists = False
         for i in range(len(self.countingElements)):
             if self.countingElements[i].eg == "I" and self.countingElements[i].swingToHS == "1":
@@ -77,10 +86,17 @@ class RingsRoutine(Routine):
             print("This routine does not have a swing to handstand element.")
             print("A rings routine needs to have one element within the couting 8 that is a swing to handstand.")
             self.isValid = False
-    
+
+    # Overrides the default special_repititions method
+    # Function to check if the routine obeys the special repititions requirements
+    # in article 12.2.2 of the MAG Code of Points 2025-2028
+    # Parameters:
+    # skill - the skill that is to be added
     def special_repititions(self, skill):
         egIIstrengths = []
         egIIIstrengths = []
+        # Special repititions only exist for element groups II and III on rings
+        # Add final strength positions for each skill to lists
         if skill.eg == "II" or skill.eg == "III":
             for i in range(len(self.countingElements)):
                 if self.countingElements[i].eg == "II":
@@ -90,6 +106,7 @@ class RingsRoutine(Routine):
             # print(egIIIstrengths)
             # print(egIIIstrengths)
             # print(f"EG: {skill.eg}")
+            # Check new skill against existing strength positions
             if skill.eg == "II":
                 # print("Checking strength shapes for II")
                 for i in range(len(egIIstrengths)):

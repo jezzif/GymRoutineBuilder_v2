@@ -48,19 +48,27 @@ class PommelRoutine(Routine):
         # If the selection isn't cancelled:
         if selection != "esc":
             # Print the chosen skill and create a new skill object
-            newSkill = self.make_newSkill(choice)
+            newSkill = self.make_newSkill(choice, "new")
             # Returns the chosen skill as an object
             return newSkill
         else:
             return "cancel"
-        
-    def make_newSkill(self, choice):
+
+    # Function to turn skill returned from database query into
+    # a PommelSkill object
+    # Parameters:
+    # choice - the row from the database
+    # task - to determine whether the routine is being created or viewed
+    def make_newSkill(self, choice, task):
         if choice[3] == "I" or choice[3] == "IV":
             newSkill = PommelSkill(choice[0], choice[1], choice[2], choice[3], choice[4], None, None, None, None)
         elif choice[3] == "II":
             newSkill = PommelSkill(choice[0], choice[1], choice[2], choice[3], choice[4], choice[5], None, None, None)
         elif choice[3] == "III":
-            newSkill = PommelSkill(choice[0], choice[1], choice[2], choice[3], choice[4], None, choice[5], choice[6], choice[7])
+            if task == "new":
+                newSkill = PommelSkill(choice[0], choice[1], choice[2], choice[3], choice[4], None, choice[5], choice[6], choice[7])
+            elif task == "view":
+                newSkill = PommelSkill(choice[0], choice[1], choice[2], choice[3], choice[4], None, choice[6], choice[7], choice[8])
         return newSkill
     
     # Overrides the default make_table method

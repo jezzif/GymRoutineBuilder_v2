@@ -8,7 +8,6 @@ from gymroutinebuilder.vt_routine import VaultRoutine
 from gymroutinebuilder.pb_routine import PbarsRoutine
 from gymroutinebuilder.hb_routine import HbarRoutine
 from gymroutinebuilder.skill import Skill
-# import os
 from gymroutinebuilder.util import ReadIntegerRange
 from gymroutinebuilder.tableMaker import Tables
 from gymroutinebuilder.connectors import Connectors
@@ -37,6 +36,7 @@ class RoutineBuilder:
 
             #What does the user want to do
             choice = ReadIntegerRange("What do you want to do? Build a new routine (1), View existing routines (2), Quit (3)", 1, 3)
+            # Build new routine
             if choice == 1:
                 #Tells function that this routine is being created and not edited
                 new_routine_check = True
@@ -62,14 +62,23 @@ class RoutineBuilder:
                     case 6:
                         currentRoutine = HbarRoutine([],0,0,0,0,0,False,[])
                         apparatus = "HB"
+                # Runs the function to build a routine
                 currentRoutine.build_routine("", new_routine_check, Routines_conn, COP_conn)
+            # View existing routines
             elif choice == 2:
                 self.view_routines(self, False, 0, Routines_conn, COP_conn)
+            # Quit
             elif choice == 3:
                 break
             else:
                 continue
 
+    # Procedure to view created routines
+    # Parameters:
+    # skip - tells program to skip asking what routine to open (only used when being called after editing)
+    # routineToOpen - the index of the routine that is to be viewed (only used when being called after editing)
+    # Routines_conn - connectors to the routine databases
+    # COP_conn - connector to the Code of Points database
     def view_routines(self, skip, routineToOpen, Routines_conn, COP_conn):
         #Prints all files in the "Routines" folder
         routineList = []
@@ -80,6 +89,7 @@ class RoutineBuilder:
                     Routines_conn.VTR_conn,
                     Routines_conn.PBR_conn,
                     Routines_conn.HBR_conn]
+        # Fetches every routine from each database
         for i in range(6):
             cursor = connList[i].cursor()
             cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
@@ -87,6 +97,7 @@ class RoutineBuilder:
             for row in rows:
                 routineList.append(row[0])
                 apparatuses.append(connList[i])
+        # If routine list is empty
         if (not routineList):
             print("There are no existing routines.")
         else:
@@ -95,7 +106,7 @@ class RoutineBuilder:
                 print("Which routine would you like to view?")
                 print(routineList)
                 routineToOpen = input() #The routine
-            #Checks if routine exists
+            # Creates new routine object
             if routineToOpen in routineList:
                 routineIndex = routineList.index(routineToOpen)
                 match apparatuses[routineIndex]:
@@ -113,13 +124,15 @@ class RoutineBuilder:
                         currentRoutine = HbarRoutine([],0,0,0,0,0,False,[])
                 current_conn = apparatuses[routineIndex]
                 cursor = current_conn.cursor()
-                
+
+                # Gets routine from database
                 query = "SELECT * FROM " + routineToOpen
                 cursor.execute(query)
                 rows = cursor.fetchall()
                 print(routineToOpen + " is a " + currentRoutine.apparatus + " routine.")
 
                 i = 0
+                # creates skill objects for each row in routine
                 for row in rows:
                     # print(row)
                     
@@ -138,11 +151,13 @@ class RoutineBuilder:
                         currentRoutine.hasEGIV += 1
                     i += 1
                 currentRoutine.print_skills()
-                #Does the routine meet all the requirements
+
+                # Does the routine meet all the requirements
                 currentRoutine.validate_routine()
                 if not currentRoutine.isValid:
                     print("This routine does not meet all of the FIG requirements and the D-score may be incorrect.")
-                #Finds D-Score
+
+                # Finds D-Score
                 if currentRoutine.apparatus != "vault":
                     routineValue = currentRoutine.calculate_D_score()
                 else:
@@ -150,6 +165,8 @@ class RoutineBuilder:
                 print("The D-score of this routine is: " + str(routineValue))
                 #else:
                     #print("Cannot calculate D-score until routine complies with FIG requirements.")
+
+                # Asks user what to do next
                 edit = ReadIntegerRange("Make changes (1), Delete routine (2), Exit (3)", 1, 3)
                 match edit:
                     case 1: #Allows editing of the routine
@@ -160,6 +177,3 @@ class RoutineBuilder:
                         if confirm == "y" or confirm == "Y":
                             query = "DROP TABLE " + routineToOpen
                             cursor.execute(query)
-
-# if __name__ == '__main__':
-#     RoutineBuilder.main(RoutineBuilder)

@@ -55,7 +55,11 @@ class PbarsRoutine(Routine):
         else:
             return "cancel"
 
-    #
+    # Function to turn skill returned from database query into
+    # a PbarsSkill object
+    # Parameters:
+    # choice - the row from the database
+    # task - to determine whether the routine is being created or viewed
     def make_newSkill(self, choice, task):
         if choice[3] == "I":
             newSkill = PbarsSkill(choice[0], choice[1], choice[2], choice[3], choice[4], choice[5], None, None)
@@ -66,10 +70,13 @@ class PbarsRoutine(Routine):
                 newSkill = PbarsSkill(choice[0], choice[1], choice[2], choice[3], choice[4], None, choice[5], choice[6])
             elif task == "view":
                 newSkill = PbarsSkill(choice[0], choice[1], choice[2], choice[3], choice[4], None, choice[6], choice[7])
-            
-        
         return newSkill
 
+    # Overrides the default special_repititions method
+    # Function to check if the routine obeys the special repititions requirements
+    # in article 14.2.2 of the MAG Code of Points 2025-2028
+    # Parameters:
+    # skill - the skill that is to be added
     def special_repititions(self, skill):
         fwdUpriseExists = 0
         giantSwingExists = 0
