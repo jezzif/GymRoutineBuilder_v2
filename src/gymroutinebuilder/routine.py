@@ -167,8 +167,10 @@ class Routine:
         print(f"Values of all skills: {difficultyTotal}")
         total = round(difficultyTotal, 1)
         #Calculates connection bonuses
-        if self.apparatus == "floor exercise" or self.apparatus == "horizontal bar":
-            print("Connection bonus calculations.")
+        if self.apparatus == "Floor Exercise" or self.apparatus == "Horizontal Bar":
+            connectionBonus = self.calculate_connections()
+            print(f"Adding {connectionBonus} for connection bonus.")
+            total += connectionBonus
         #Awards element group requirement value
         added = False
         if self.hasEGI > 0:
@@ -324,6 +326,7 @@ class Routine:
                     newSkill = self.add_skill(COP_conn)
                     # Adds the newSkill object to the Routine object's list of skills
                     #print("build_routine check " + newSkill.doubleSalto)
+                    print(f"In build isConnected? {newSkill.isConnected}")
                     if newSkill != "cancel":
                         self.skills.append(newSkill)
                         self.numberOfSkills += 1
@@ -341,11 +344,20 @@ class Routine:
                     
                     if self.apparatus == "Floor Exercise":
                         # sql query for inserting skills
-                        insertStatement += ", strengthElement, circleElement, oneLegBalance, doubleSalto) VALUES(?,?,?,?,?,?,?,?,?)"
+                        insertStatement += ", isConnected, strengthElement, circleElement, oneLegBalance, doubleSalto) VALUES(?,?,?,?,?,?,?,?,?,?)"
                         # Creates an array for the sql query to execute from
                         contents = []
                         for i in range(len(self.skills)):
-                            contents.append([self.skills[i].name, self.skills[i].description, self.skills[i].value, self.skills[i].eg, self.skills[i].number, self.skills[i].strengthElement, self.skills[i].circleElement, self.skills[i].oneLegBalance, self.skills[i].doubleSalto])
+                            contents.append([self.skills[i].name,
+                                            self.skills[i].description,
+                                            self.skills[i].value,
+                                            self.skills[i].eg,
+                                            self.skills[i].number,
+                                            self.skills[i].isConnected,
+                                            self.skills[i].strengthElement,
+                                            self.skills[i].circleElement,
+                                            self.skills[i].oneLegBalance,
+                                            self.skills[i].doubleSalto])
                     elif self.apparatus == "Pommel Horse":
                         # sql query for inserting skills
                         insertStatement += ", fullSpindle, fullSpindleTravels, fullCrossSupTravels, fullRussianTravels) VALUES(?,?,?,?,?,?,?,?,?)"

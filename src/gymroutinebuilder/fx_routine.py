@@ -25,14 +25,28 @@ class FloorRoutine(Routine):
         print("IV. Single salto forward and/or backward with 1 or more turns.")
         elementGroup = ReadIntegerRange("What element group do you want to see skills for? (1, 2, 3, 4)", 1, 4)
         # Sets the last part of baseQuery to the correct element group
-        if elementGroup == 1:
+        # if elementGroup == 1:
+        #     egString = "i"
+        # elif elementGroup == 2:
+        #     egString = "ii"
+        # elif elementGroup == 3:
+        #     egString = "iii"
+        # elif elementGroup == 4:
+        #     egString = "iv"
+        if elementGroup != 1:
+            if input("Is this element connected to the next? (Y/N) ") == "Y":
+                connected = 1
+            else:
+                connected = 0
+            if elementGroup == 2:
+                egString = "ii"
+            elif elementGroup == 3:
+                egString = "iii"
+            elif elementGroup == 4:
+                egString = "iv"
+        else:
             egString = "i"
-        elif elementGroup == 2:
-            egString = "ii"
-        elif elementGroup == 3:
-            egString = "iii"
-        elif elementGroup == 4:
-            egString = "iv"
+            connected = None
         query = baseQuery + egString + ";"
         # Executes the sql query and prints the results
         cursor.execute(query)
@@ -52,7 +66,7 @@ class FloorRoutine(Routine):
             print(choice[0])
             print(choice[3])
             
-            newSkill = self.make_newSkill(choice, "new")
+            newSkill = self.make_newSkill(choice, "new", connected)
             
             # Returns the chosen skill as an object
             return newSkill
@@ -65,17 +79,25 @@ class FloorRoutine(Routine):
     # Parameters:
     # choice - the row from the database
     # task - to determine whether the routine is being created or viewed
-    def make_newSkill(self, choice, task):
+    def make_newSkill(self, choice, task, connected):
         if choice[3] == "I":
-            newSkill = FloorSkill(choice[0], choice[1], choice[2], choice[3], choice[4], False, choice[5], choice[6], choice[7], None)
+            if task == "new":
+                newSkill = FloorSkill(choice[0], choice[1], choice[2], choice[3], choice[4], None, choice[5], choice[6], choice[7], None)
+            if task == "view":
+                newSkill = FloorSkill(choice[0], choice[1], choice[2], choice[3], choice[4], None, choice[6], choice[7], choice[8], None)
         elif choice[3] == "II" or choice[3] == "III":
             if task == "new":
-                newSkill = FloorSkill(choice[0], choice[1], choice[2], choice[3], choice[4], False, None, None, None, choice[5])
+                newSkill = FloorSkill(choice[0], choice[1], choice[2], choice[3], choice[4], connected, None, None, None, choice[5])
             elif task == "view":
-                newSkill = FloorSkill(choice[0], choice[1], choice[2], choice[3], choice[4], False, None, None, None, choice[8])
+                newSkill = FloorSkill(choice[0], choice[1], choice[2], choice[3], choice[4], choice[5], None, None, None, choice[9])
         elif choice[3] == "IV":
-            newSkill = FloorSkill(choice[0], choice[1], choice[2], choice[3], choice[4], False, None, None, None, None)
+            if task == "new":
+                newSkill = FloorSkill(choice[0], choice[1], choice[2], choice[3], choice[4], connected, None, None, None, None)
+            elif task == "view":
+                newSkill = FloorSkill(choice[0], choice[1], choice[2], choice[3], choice[4], choice[5], None, None, None, None)        
         return newSkill
+
+    
 
     # Procedure to check whether the routine meets FIG requirements
     def validate_routine(self):
@@ -124,6 +146,36 @@ class FloorRoutine(Routine):
                 return True
         else:
             return True
+
+    def calculate_connections(self):
+        print("Calculating connection values")
+        connectionBonus = 0
+        for i in range(len(self.skills)):
+            skill1 = None
+            skill2 = None
+            if self.skills[i].isConnected == 1:
+                try:
+                    for j in range(len(self.countingElements)):
+                        if self.skills[i] == self.countingElements[j]:
+                            skill1 = i
+                        elif self.skills[i+1] == self.countingElements[j]:
+                            skill2 = i+1
+                    if skill1 != None and skill2 != None:
+                        if self.skills[skill1].eg != "IV" or self.skills[skill2].eg != "IV":
+                            if float(self.skills[skill1].value) >= 0.4 and (float(self.skills[skill2].value) == 0.2 or float(self.skills[skill2].value) == 0.3):
+                                connectionBonus += 0.1
+                            elif float(self.skills[skill2].value) >= 0.4 and (float(self.skills[skill1].value) == 0.2 or float(self.skills[skill1].value) == 0.3):
+                                connectionBonus += 0.1
+                            elif float(self.skills[skill1].value) >= 0.4 and float(self.skills[skill2].value) >= 0.4:
+                                connectionBonus += 0.2
+                        else:
+                            print("Two complex twist elements do not recieve a connection bonus")
+                except IndexError:
+                    print("The last skill in a routine cannot be connected to another element.")
+        return connectionBonus
+        
+
+
             
     # Overrides the default make_table method
     # Procedure to make a new table in the Routines database
@@ -137,6 +189,7 @@ class FloorRoutine(Routine):
                        skillValue NOT NULL, 
                        skillElemGrp NOT NULL, 
                        skillNumber NOT NULL, 
+                       isConnected,
                        strengthElement, 
                        circleElement,
                        oneLegBalance,
